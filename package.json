@@ -1,0 +1,19 @@
+{
+  "name": "@ucdlib/service-init",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "kafka": "node kafka/index.js",
+    "google-cloud-metrics": "node google-cloud-metrics/index.js"
+  },
+  "author": "jrmerz@ucdavis.edu",
+  "license": "ISC",
+  "dependencies": {
+    "@google-cloud/logging-bunyan": "^4.1.0",
+    "@google-cloud/monitoring": "^3.0.0"
+  }
+}

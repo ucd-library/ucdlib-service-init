@@ -1,0 +1,20 @@
+ARG KAFKA_IMAGE
+FROM ${KAFKA_IMAGE}
+
+USER root
+
+# Install node & other apt dependencies
+RUN curl -fsSL https://deb.nodesource.com/setup_${NODE_VERSION}.x | bash -
+RUN apt-get update && apt-get install -y --no-install-recommends nodejs
+
+RUN mkdir /service
+WORKDIR /service
+
+COPY package.json .
+COPY package-lock.json .
+RUN npm install
+
+COPY lib lib
+COPY kafka kafka
+
+CMD [ "npm", "run", "kafka" ]
