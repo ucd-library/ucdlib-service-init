@@ -10,5 +10,5 @@ gcloud config set project ${GC_PROJECT_ID}
 echo "Submitting build to Google Cloud project ${GC_PROJECT_ID}..."
 gcloud builds submit \
   --config ./cloudbuild.yaml \
-  --substitutions=BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD) \
-  .
+  --substitutions=REPO_NAME=$(basename $(git remote get-url origin)),BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD) \
+  ..
