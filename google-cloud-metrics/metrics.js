@@ -1,5 +1,5 @@
 import config from '../lib/config.js';
-import logger from './lib/logger.js';
+import logger from '../lib/logger.js';
 import monitoring from '@google-cloud/monitoring';
 
 // https://cloud.google.com/monitoring/custom-metrics/creating-metrics

@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "directories": {
     "lib": "lib"
   },
@@ -14,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@google-cloud/logging-bunyan": "^4.1.0",
-    "@google-cloud/monitoring": "^3.0.0"
+    "@google-cloud/monitoring": "^3.0.0",
+    "deepmerge": "^4.2.2"
   }
 }

@@ -2,29 +2,36 @@ import logger from '../lib/logger.js';
 import config from '../lib/config.js';
 import waitUntil from '../lib/wait-until.js';
 import exec from '../lib/exec.js';
+import deepmerge from 'deepmerge';
 import fs from "fs";
 import path from 'path';
 
-let filePath = env.KAFKA_TOPIC_CONFIG || path.resolve(config.fsRoot, 'kafka.js');
+let filePath = process.env.KAFKA_TOPIC_CONFIG || path.resolve(config.fsRoot, 'kafka.js');
 
 async function setupTopic(topic) {
-  topic = Object.assign({}, topic, config.kafka.topicDefaults);
+  let defaults = deepmerge({}, config.kafka.topicDefaults);
+  topic = deepmerge(defaults, topic);
 
   logger.info(`Ensuring ${topic.name}`);
   try {
-    var {stdout, stderr} = exec(`kafka-topics.sh --create \
+    let output = await exec(`kafka-topics.sh --create \
+    --if-not-exists \
     --bootstrap-server ${config.kafka.host}:${config.kafka.port} \
     --replication-factor ${topic.replication_factor} \
     --partitions ${topic.partitions} \
     --topic ${topic.name}`);
-  
-    logger.info(`Setting topic retention: ${topic.retention/(1000*60*60*24)} days`);
+    logger.info(output);
 
-    var {stdout, stderr} = exec(`kafka-configs.sh --alter \
-    --bootstrap-server ${config.kafka.host}:${config.kafka.port} \
-    --entity-type topics \
-    --entity-name ${topic.name} \
-    --add-config retention.ms=${topic.retention}`);
+    for( let key in topic.options ) {
+      logger.info(`Setting topic ${key}=${topic.options[key]} `);
+
+      let output = await exec(`kafka-configs.sh --alter \
+      --bootstrap-server ${config.kafka.host}:${config.kafka.port} \
+      --entity-type topics \
+      --entity-name ${topic.name} \
+      --add-config ${key}=${topic.options[key]}`);
+      logger.info(output);
+    }
 
   } catch(e) {
     logger.error(e);
@@ -39,7 +46,8 @@ async function setupTopic(topic) {
   let topicConfigs;
   if( fs.existsSync(filePath) ) {
     logger.info('Using config file: '+filePath);
-    topicConfigs = await import(filepath);
+    topicConfigs = await import(filePath);
+    if( topicConfigs.default ) topicConfigs = topicConfigs.default;
   } else {
     throw new Error('No kafka config file found: '+filePath);
   }
