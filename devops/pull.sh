@@ -8,4 +8,3 @@ cd $ROOT_DIR
 source config.sh
 
 docker pull $NODE_IMAGE_NAME:$BRANCH_NAME
-docker pull $KAFKA_IMAGE_NAME:$BRANCH_NAME

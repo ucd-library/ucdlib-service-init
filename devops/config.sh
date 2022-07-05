@@ -22,4 +22,3 @@ if [[ -z $A6T_REG_HOST ]]; then
 fi
 
 NODE_IMAGE_NAME=$A6T_REG_HOST/init-services
-KAFKA_IMAGE_NAME=$A6T_REG_HOST/init-services-kafka

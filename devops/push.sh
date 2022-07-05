@@ -8,4 +8,3 @@ cd $ROOT_DIR
 source config.sh
 
 docker push $NODE_IMAGE_NAME:$BRANCH_NAME
-docker push $KAFKA_IMAGE_NAME:$BRANCH_NAME

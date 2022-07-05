@@ -8,7 +8,7 @@ let monitoring = new Monitoring();
 
 let filePath = process.env.METRICS_CONFIG || path.resolve(config.fsRoot, 'google-cloud-metrics.js');
 
-(async function() {
+async function run() {
   let metricConfigs;
   if( fs.existsSync(filePath) ) {
     logger.info('Using config file: '+filePath);
@@ -23,6 +23,7 @@ let filePath = process.env.METRICS_CONFIG || path.resolve(config.fsRoot, 'google
   }
   await monitoring.ensureMetrics();
 
-  logger.info('Google Cloud Metrics initialization complete.  Exiting. (this is supposed to happen)');
-  setTimeout(() => {process.exit()});
-})();
+  logger.info('Google Cloud Metrics initialization complete.');
+};
+
+export default run;

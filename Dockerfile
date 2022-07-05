@@ -10,3 +10,5 @@ RUN npm install
 
 COPY lib lib
 COPY google-cloud-metrics google-cloud-metrics
+COPY kafka kafka
+COPY postgres postgres
