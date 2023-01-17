@@ -28,7 +28,7 @@ async function run() {
   // TODO: add migrations
   logger.info('loading sql files from: '+dirPath)
 
-  let files = fs.readdirSync(dirPath);
+  let files = sort(fs.readdirSync(dirPath));
   for( let file of files ) {
     if( path.parse(file).ext.toLowerCase() !== '.sql' ) continue;
     file = path.join(dirPath, file);
@@ -36,6 +36,28 @@ async function run() {
     let response = await client.query(fs.readFileSync(file, 'utf-8'));
     logger.debug(response);
   }
+}
+
+function sort(files) {
+  files = files.map(file => {
+    let index = 0;
+    let name = file;
+    if( file.match('-') ) {
+      index = parseInt(file.split('-')[0]);
+      name = file.split('-')[1];
+    } 
+    return {file, index, name};
+  });
+
+  files.sort((a,b) => {
+    if( a.index < b.index ) return -1;
+    if( a.index > b.index ) return 1;
+    if( a.name < b.name ) return -1;
+    if( a.name > b.name ) return 1;
+    return 0;
+  });
+
+  return files.map(item => item.file);
 }
 
 export default run;
