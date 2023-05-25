@@ -1,6 +1,6 @@
 #! /bin/bash
 
-NODE_VERSION=16
+NODE_VERSION=18
 # KAFKA_IMAGE=bitnami/kafka:2.5.0
 KAFKA_IMAGE=bitnami/kafka:3.2.0
 

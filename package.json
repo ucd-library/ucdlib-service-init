@@ -17,6 +17,7 @@
   "dependencies": {
     "@google-cloud/logging-bunyan": "^4.1.0",
     "@google-cloud/monitoring": "^3.0.0",
+    "bunyan": "^1.8.15",
     "deepmerge": "^4.2.2",
     "kafkajs": "^2.1.0",
     "pg": "^8.7.3"
