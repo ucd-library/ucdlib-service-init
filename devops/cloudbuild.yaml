@@ -1,5 +1,18 @@
 steps:
 
+  - name: 'gcr.io/cloud-builders/git'
+    secretEnv: ['ARM_BUILDER_SSH_KEY', 'ARM64_MACHINE_IP']
+    entrypoint: 'bash'
+    args:
+    - -c
+    - |
+      echo "$$SANDBOX_SSH_KEY" >> /root/.ssh/ci-bot
+      chmod 400 /root/.ssh/ci-bot
+      ssh-keyscan -t rsa $$ARM64_MACHINE_IP > /root/.ssh/known_hosts
+    volumes:
+    - name: 'ssh'
+      path: /root/.ssh
+
   - name: gcr.io/cloud-builders/docker
     entrypoint: "bash"
     args: ["-c", "./devops/pull.sh"]
@@ -13,6 +26,10 @@ steps:
     env: 
     - 'REPO_NAME=$REPO_NAME'
     - 'BRANCH_NAME=$BRANCH_NAME'
+    secretEnv: ['ARM64_MACHINE_IP']
+    volumes:
+    - name: 'ssh'
+      path: /root/.ssh
 
   - name: gcr.io/cloud-builders/docker
     entrypoint: "bash"
@@ -20,5 +37,16 @@ steps:
     env:
     - 'REPO_NAME=$REPO_NAME'
     - 'BRANCH_NAME=$BRANCH_NAME'
+
+options:
+  pool:
+    name: projects/digital-ucdavis-edu/locations/us-central1/workerPools/ucd-lib-arm-builds
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/digital-ucdavis-edu/secrets/arm64-builder-ci-bot-ssh-key/versions/latest
+    env: 'ARM_BUILDER_SSH_KEY'
+  - versionName: projects/digital-ucdavis-edu/secrets/arm64-builder-ip/versions/latest
+    env: 'ARM64_MACHINE_IP'
 
 timeout: 1800s
