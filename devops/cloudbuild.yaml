@@ -31,12 +31,12 @@ steps:
     - name: 'ssh'
       path: /root/.ssh
 
-  - name: gcr.io/cloud-builders/docker
-    entrypoint: "bash"
-    args: ["-c", "./devops/push.sh"]
-    env:
-    - 'REPO_NAME=$REPO_NAME'
-    - 'BRANCH_NAME=$BRANCH_NAME'
+  # - name: gcr.io/cloud-builders/docker
+  #   entrypoint: "bash"
+  #   args: ["-c", "./devops/push.sh"]
+  #   env:
+  #   - 'REPO_NAME=$REPO_NAME'
+  #   - 'BRANCH_NAME=$BRANCH_NAME'
 
 options:
   pool:
