@@ -1,11 +1,25 @@
 steps:
 
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - 'gcloud compute instances start arm64-build-instance --zone=us-central1-a'
+
+  # make sure the instance is up and running
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - 'gcloud compute instances describe arm64-build-instance --zone=us-central1-a --format="yaml(name,status)"'
+
   - name: 'gcr.io/cloud-builders/git'
     secretEnv: ['ARM_BUILDER_SSH_KEY', 'ARM64_MACHINE_IP']
     entrypoint: 'bash'
     args:
     - -c
     - |
+      sleep 10
       echo "$$SANDBOX_SSH_KEY" >> /root/.ssh/ci-bot
       chmod 400 /root/.ssh/ci-bot
       ssh-keyscan -t rsa $$ARM64_MACHINE_IP > /root/.ssh/known_hosts
