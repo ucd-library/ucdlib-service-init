@@ -14,43 +14,64 @@ steps:
       - 'gcloud compute instances describe arm64-build-instance --zone=us-central1-a --format="yaml(name,status)"'
 
   - name: 'gcr.io/cloud-builders/git'
+    id: 'setup-ssh'
     secretEnv: ['ARM_BUILDER_SSH_KEY', 'ARM64_MACHINE_IP']
     entrypoint: 'bash'
     args:
     - -c
     - |
-      sleep 10
-      echo "$$SANDBOX_SSH_KEY" >> /root/.ssh/ci-bot
+      echo "writing key"
+      echo "$$ARM_BUILDER_SSH_KEY" >> /root/.ssh/ci-bot
+      echo "modifying key permissions"
       chmod 400 /root/.ssh/ci-bot
+      echo "adding key to ssh agent"
       ssh-keyscan -t rsa $$ARM64_MACHINE_IP > /root/.ssh/known_hosts
+      echo "ssh setup complete"
+      sleep 60
     volumes:
     - name: 'ssh'
       path: /root/.ssh
 
-  # - name: gcr.io/cloud-builders/docker
-  #   entrypoint: "bash"
-  #   args: ["-c", "./devops/pull.sh"]
-  #   env:
-  #   - 'REPO_NAME=$REPO_NAME'
-  #   - 'BRANCH_NAME=$BRANCH_NAME'
-
   - name: gcr.io/cloud-builders/docker
+    waitFor: ['setup-ssh']
     entrypoint: "bash"
     args: ["-c", "./devops/build.sh;"]
     env: 
     - 'REPO_NAME=$REPO_NAME'
-    - 'BRANCH_NAME=$BRANCH_NAME'
+    - 'BRANCH_NAME=$BRANCH_NAME'      
+    - 'BUILD_ARCHITECTURE=amd'
+    - 'GCLOUD_BUILD=true'
+    - 'GIT_DISCOVERY_ACROSS_FILESYSTEM=1'
     secretEnv: ['ARM64_MACHINE_IP']
     volumes:
     - name: 'ssh'
       path: /root/.ssh
 
-  # - name: gcr.io/cloud-builders/docker
-  #   entrypoint: "bash"
-  #   args: ["-c", "./devops/push.sh"]
-  #   env:
-  #   - 'REPO_NAME=$REPO_NAME'
-  #   - 'BRANCH_NAME=$BRANCH_NAME'
+  - name: gcr.io/cloud-builders/docker
+    waitFor: ['setup-ssh']
+    entrypoint: "bash"
+    args: ["-c", "./devops/build.sh;"]
+    env: 
+    - 'REPO_NAME=$REPO_NAME'
+    - 'BRANCH_NAME=$BRANCH_NAME'      
+    - 'BUILD_ARCHITECTURE=arm'
+    - 'GCLOUD_BUILD=true'
+    - 'GIT_DISCOVERY_ACROSS_FILESYSTEM=1'
+    secretEnv: ['ARM64_MACHINE_IP']
+    volumes:
+    - name: 'ssh'
+      path: /root/.ssh
+
+  - name: gcr.io/cloud-builders/docker
+    entrypoint: "bash"
+    args: ["-c", "./devops/create-manifest.sh"]
+    env: 
+      - 'GCLOUD_BUILD=true'
+      - 'GIT_DISCOVERY_ACROSS_FILESYSTEM=1'
+      - 'SHORT_SHA=$SHORT_SHA'
+      - 'TAG_NAME=$TAG_NAME'
+      - 'BRANCH_NAME=$BRANCH_NAME'
+
 
 options:
   pool:
