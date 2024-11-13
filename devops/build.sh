@@ -7,7 +7,6 @@ cd $ROOT_DIR
 
 source config.sh
 
-#! /bin/bash
 DOCKER="docker"
 if [[ ! -z $BUILD_ARCHITECTURE ]]; then
   DOCKER="$DOCKER --context $BUILD_ARCHITECTURE"

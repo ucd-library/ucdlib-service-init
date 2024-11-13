@@ -1,0 +1,14 @@
+{
+  "registry" : "gcr.io/ucdlib-pubreg",
+
+  "repositories" : {},
+
+  "images" : {
+    "init-services" : {
+      "contextPath" : ".",
+      "options" : {
+        "build-arg" : ["NODE_VERSION=20"]
+      }
+    }
+  }
+}
